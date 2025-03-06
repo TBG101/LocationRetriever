@@ -13,16 +13,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.pm.PackageManager;
 import android.Manifest;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 102;
@@ -30,10 +33,20 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
 
+    private RecyclerView rc;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        List<Position> data = new ArrayList<Position>();
+        data.add(new Position(0, 0, 0));
+        data.add(new Position(0, 0, 5));
+        data.add(new Position(0, 0, 4));
+        PositionAdapater adapter = new PositionAdapater(data);
+        rc.findViewById(R.id.recycler);
+        rc.setLayoutManager(new LinearLayoutManager(this));
+        rc.setAdapter(adapter);
 
         locationTextView = findViewById(R.id.locationTextView);
         Button locationButton = findViewById(R.id.locationButton);
@@ -67,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(5000); // Update every 5 seconds
 
             Intent intent = new Intent(this, LocationReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
             fusedLocationClient.requestLocationUpdates(locationRequest, pendingIntent);
 
